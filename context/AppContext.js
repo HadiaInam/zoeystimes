@@ -1,13 +1,16 @@
 'use client'
-import { createContext} from "react";
+import { createContext, useState} from "react";
 
 
 export const AppContext = createContext()
 
 const AppContextProvider = (props) => {
 
-    const value = {
+    const [theme, setTheme] = useState('beary-cute')
 
+    const value = {
+        theme,
+        setTheme
     }
 
     return (
