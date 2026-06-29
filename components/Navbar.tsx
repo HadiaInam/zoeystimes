@@ -1,6 +1,7 @@
 'use client'
 import React, { useContext, useEffect } from 'react'
 import {AppContext} from "@/context/AppContext";
+import { redirect } from 'next/navigation';
 
 const Navbar = () => {
 
@@ -28,8 +29,9 @@ const bgMap: Record<string, string> = {
       <div>
   <img 
     src={logoMap[theme]} 
-    className="lg:h-26 md:h-22"
+    className="lg:h-26 md:h-22 cursor-pointer"
     alt={`${theme} logo`}
+    onClick={() => redirect('/')}
   />
 </div>
 
@@ -37,19 +39,19 @@ const bgMap: Record<string, string> = {
       <div className={`flex gap-5 items-center mr-3 `}>
 
         <div className="">
-          <img src={'./chicky-nav.png'} className='h-10 cursor-pointer' alt="" onClick={()=> setTheme('chicky-choo')} />
+          <img src={'./chicky-nav.png'} className='h-10 cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('chicky-choo')} />
         </div>
 
          <div className="">
-          <img src={'./beary-nav.png'} className='h-10 cursor-pointer' alt="" onClick={()=> setTheme('beary-cute')} />
+          <img src={'./beary-nav.png'} className='h-10 cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('beary-cute')} />
         </div>
 
         <div className="">
-          <img src={'./mochi-nav.png'} className='h-10 cursor-pointer' alt="" onClick={()=> setTheme('mochi')} />
+          <img src={'./mochi-nav.png'} className='h-10 cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('mochi')} />
         </div>
 
         <div className="">
-          <img src={'./caths-nav.png'} className='h-10 cursor-pointer' alt="" onClick={()=> setTheme('caths')} />
+          <img src={'./caths-nav.png'} className='h-10 cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('caths')} />
         </div>
       </div>
 

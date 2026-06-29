@@ -1,8 +1,66 @@
-import React from 'react'
+'use client'
+import React, { useContext, useEffect, useRef } from 'react'
+import { AppContext } from "@/context/AppContext";
+import { useRouter } from 'next/navigation';
+
 
 const page = () => {
+  const { theme, setTheme } = useContext(AppContext)
+  const router = useRouter()
+
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    if (audio) {
+      audio.volume = 0.4;
+      audio.loop = true;
+
+      // Browsers require user interaction before playing audio.
+      audio.play().catch(() => {});
+    }
+
+    return () => {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    };
+  }, []);
+
+  const bgMap: Record<string, string> = {
+    'chicky-choo': 'bg-[#E5D360]/26',
+    'beary-cute': 'bg-[#AB6D30]/26',
+    'mochi': 'bg-[#AFCC5E]/26',
+    'caths': 'bg-[#F5DFD2]',
+  };
+
   return (
-    <div>hello</div>
+    <div className='text-[#7F4E1C] mt-20 text-center'>
+
+      <audio ref={audioRef}>
+        <source src="/bg-music.mp3" type="audio/mpeg" />
+      </audio>
+
+
+      {/* ------------ TITLE ----------- */}
+      <div className="text-4xl">Choose a Mode</div>
+
+      {/* ------------ MODES ---------------- */}
+      <div className="flex items-center justify-center gap-10 mt-10 ">
+        <div onClick={() => router.push('/guided-practice')} className={`border-2 cursor-pointer border-[#7F4E1C] rounded-3xl h-80 w-60 flex flex-col items-center justify-center gap-9 ${bgMap[theme]}`}>
+          <div className="text-2xl">Guided Practice</div>
+          <img src={'./guided-practice.png'} className='h-40 animate-bounce' alt="" />
+        </div>
+
+
+        <div onClick={() => router.push('/random-practice')} className={`border-2 cursor-pointer border-[#7F4E1C] rounded-3xl h-80 w-60 flex flex-col items-center justify-center gap-9 ${bgMap[theme]}`}>
+          <div className="text-2xl">Random Practice</div>
+          <img src={'./random-practice.png'} className='h-40 animate-bounce' alt="" />
+        </div>
+      </div>
+    </div>
   )
 }
 
