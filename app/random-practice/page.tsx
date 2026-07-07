@@ -13,9 +13,35 @@ const page = () => {
   const [timerStarted, setTimerStarted] = useState(false)
   const [spokenAnswer, setSpokenAnswer] = useState<string | null>("");
   const [result, setResult] = useState<null | string>(null)
+  const NUMBERS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
   const speechRef = useRef<any>(null);
 
   const startRef = useRef(start);
+  const tableRef = useRef<number[] | null>(null);
+
+    const [table, setTable] = useState<number[] | null>(null);
+  
+    const toggleTable = (num: number) => {
+      setTable((prev) => {
+        let next: number[] | null;
+
+        if (prev === null) {
+          next = [num];
+        } else if (prev.includes(num)) {
+          const filtered = prev.filter((n) => n !== num);
+          next = filtered.length === 0 ? null : filtered;
+        } else {
+          next = [...prev, num];
+        }
+
+        tableRef.current = next;
+        return next;
+      });
+    };
+
+  useEffect(() => {
+    tableRef.current = table;
+  }, [table]);
 
   useEffect(() => {
     startRef.current = start;
@@ -27,14 +53,17 @@ const page = () => {
     }
   }, [start]);
 
-  window.addEventListener('keydown', (event) => {
-  if (event.code === 'Space') {
-    event.preventDefault(); 
-    
-    setSeconds(0)
-  }
-});
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code === 'Space') {
+        event.preventDefault();
+        setSeconds(0);
+      }
+    };
 
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const number_to_word: Record<number, string> = {
     1: 'one',
@@ -144,12 +173,11 @@ const page = () => {
 
     const cleaned = spokenAnswer?.trim().toLowerCase() || '0'
 
-    // 1️⃣ If it's digits like "87"
+
     if (/^\d+$/.test(cleaned)) {
       total = Number(cleaned);
     }
 
-    // 2️⃣ If it's word-based like "eighty seven"
     const words = cleaned
       .replace(/-/g, " ")
       .split(" ")
@@ -187,14 +215,34 @@ const page = () => {
 
   }, [seconds])
 
+  const pickRandom = (nums: number[]) => nums[Math.floor(Math.random() * nums.length)];
+
   const nextQuestion = async () => {
     setResult(null)
     setSpokenAnswer(null)
     setTimerStarted(false);
     setSeconds(8);
-    const number_one = Math.floor(Math.random() * (12 - 2 + 1)) + 2
+
+    const selectedTables = tableRef.current;
+    let number_one: number;
+    let number_two: number;
+
+    if (selectedTables === null) {
+      number_one = pickRandom(NUMBERS);
+      number_two = pickRandom(NUMBERS);
+    } else {
+      const fromSelected = pickRandom(selectedTables);
+      const other = pickRandom(NUMBERS);
+      if (Math.random() < 0.5) {
+        number_one = fromSelected;
+        number_two = other;
+      } else {
+        number_one = other;
+        number_two = fromSelected;
+      }
+    }
+
     setNumberOne(number_one)
-    const number_two = Math.floor(Math.random() * (12 - 2 + 1)) + 2
     setNumberTwo(number_two)
     const get_answer = number_one * number_two
     setAnswer(get_answer)
@@ -243,27 +291,53 @@ const page = () => {
   };
 
   const charWidth: Record<string, string> = {
-    'chicky-choo': '50',
-    'beary-cute': '40',
-    'mochi': '60',
-    'caths': '70',
+    'chicky-choo': 'w-50',
+    'beary-cute': 'w-40',
+    'mochi': 'w-60',
+    'caths': 'w-70',
   };
 
 
   return (
-    <div className='text-[#7F4E1C] flex flex-col justify-center items-center mt-10'>
-      <div className="text-3xl">Practice</div>
+    <div className='text-[#7F4E1C] flex flex-col justify-center items-center mt-8'>
+
+      {/* --------- Select the tables buttons ----------- */}
+      <div className="flex items-center justify-center gap-2 m-5 flex-wrap">
+      <div
+        onClick={() => {
+          tableRef.current = null;
+          setTable(null);
+        }}
+        className={`text-xl font-bold text-[#7F4E1C] rounded-full px-5 py-2 cursor-pointer border-2 border-[#7F4E1C] ${
+          table === null ? "bg-[#7F4E1C] text-white" : ""
+        }`}
+      >
+        All
+      </div>
+
+      {NUMBERS.map((num) => (
+        <div
+          key={num}
+          onClick={() => toggleTable(num)}
+          className={`text-xl font-bold text-[#7F4E1C] rounded-full px-5 py-2 cursor-pointer border-2 border-[#7F4E1C] ${
+            table?.includes(num) ? "bg-[#7F4E1C] text-white" : ""
+          }`}
+        >
+          {num}
+        </div>
+      ))}
+    </div>
 
       {/* --------- Practice section ----------- */}
 
-      <div className='flex items-center justify-center gap-20 mt-10'>
+      <div className='flex items-center justify-center gap-20 mt-5'>
         {/* ----------- Right side --------- */}
         <div className="flex flex-col items-center justify-between h-90">
           <div className="flex flex-col items-center">
             <div className="text-xl">TIMER</div>
             <div className="text-5xl">00:{seconds < 10 && '0'}{seconds}</div>
           </div>
-          <img src={`${charMap[theme]}`} className={`w-${charWidth[theme]}`} alt="" />
+          <img src={`${charMap[theme]}`} className={charWidth[theme]} alt="" />
         </div>
 
         {/* ----------- Left Side ------------ */}
