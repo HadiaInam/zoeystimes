@@ -29,33 +29,33 @@ const bgMap: Record<string, string> = {
       <div>
   <img 
     src={logoMap[theme]} 
-    className="lg:h-26 md:h-22 cursor-pointer"
+    className="md:h-26 h-20 cursor-pointer"
     alt={`${theme} logo`}
     onClick={() => redirect('/')}
   />
 </div>
 
       {/* ----------- THEMES ---------- */}
-      <div className={`flex gap-5 items-center mr-3 `}>
+      <div className={`flex sm:gap-5 gap-2 items-center mr-3 `}>
 
         <div className="flex flex-col items-center">
-          <img src={'/chicky-nav.png'} className='h-10 cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('chicky-choo')} />
-          <div className="text-sm">Chicky-choo</div>
+          <img src={'/chicky-nav.png'} className='md:h-10 h-8 cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('chicky-choo')} />
+          <div className="sm:text-sm sm:block hidden">Chicky-choo</div>
         </div>
 
          <div className="flex flex-col items-center">
-          <img src={'/beary-nav.png'} className='h-10 cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('beary-cute')} />
-          <div className="text-sm">Beary-cute</div>
+          <img src={'/beary-nav.png'} className='md:h-10 h-8  cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('beary-cute')} />
+          <div className="sm:text-sm sm:block hidden">Beary-cute</div>
         </div>
 
         <div className="flex flex-col items-center">
-          <img src={'/mochi-nav.png'} className='h-10 cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('mochi')} />
-          <div className="text-sm">Mochi</div>
+          <img src={'/mochi-nav.png'} className='md:h-10 h-8  cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('mochi')} />
+          <div className="sm:text-sm sm:block hidden">Mochi</div>
         </div>
 
         <div className="flex flex-col items-center">
-          <img src={'/caths-nav.png'} className='h-10 cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('caths')} />
-          <div className="text-sm">Caths</div>
+          <img src={'/caths-nav.png'} className='md:h-10 h-8  cursor-pointer hover:animate-spin' alt="" onClick={()=> setTheme('caths')} />
+          <div className="sm:text-sm sm:block hidden">Caths</div>
         </div>
       </div>
 

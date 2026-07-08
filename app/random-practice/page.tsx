@@ -17,6 +17,7 @@ const page = () => {
   const speechRef = useRef<any>(null);
 
   const startRef = useRef(start);
+  const timerStartedRef = useRef(timerStarted);
   const tableRef = useRef<number[] | null>(null);
 
     const [table, setTable] = useState<number[] | null>(null);
@@ -48,21 +49,36 @@ const page = () => {
 
     if (start) {
       nextQuestion();
-    }else {
-      setSeconds(0)
+    } else {
+      setSeconds(0);
     }
   }, [start]);
 
   useEffect(() => {
+    timerStartedRef.current = timerStarted;
+  }, [timerStarted]);
+
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code === 'Space') {
+      if (event.code === 'Space' && timerStartedRef.current) {
         event.preventDefault();
         setSeconds(0);
       }
     };
 
+    const handleClick = () => {
+      if (timerStartedRef.current) {
+        setSeconds(0);
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('click', handleClick);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('click', handleClick);
+    };
   }, []);
 
   const number_to_word: Record<number, string> = {
@@ -114,17 +130,6 @@ const page = () => {
 
 
   useEffect(() => {
-    if (!timerStarted || seconds <= 0) return;
-
-    const intervalId = setInterval(() => {
-      setSeconds((prev) => prev - 1);
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-
-  })
-
-  useEffect(() => {
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
@@ -155,7 +160,7 @@ const page = () => {
     speechRef.current?.start();
 
     const intervalId = setInterval(() => {
-      setSeconds((prev) => prev - 1);
+      setSeconds((prev) => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
 
     return () => {
@@ -290,25 +295,38 @@ const page = () => {
     'caths': './caths.png',
   };
 
-  const charWidth: Record<string, string> = {
-    'chicky-choo': 'w-50',
-    'beary-cute': 'w-40',
-    'mochi': 'w-60',
-    'caths': 'w-70',
+  const charWidthLg: Record<string, string> = {
+    'chicky-choo': 'lg:w-50',
+    'beary-cute': 'lg:w-40',
+    'mochi': 'lg:w-60',
+    'caths': 'lg:w-70',
   };
 
+  const charWidthMd: Record<string, string> = {
+    'chicky-choo': 'md:w-45',
+    'beary-cute': 'md:w-35',
+    'mochi': 'md:w-55',
+    'caths': 'md:w-65',
+  };
+
+  const charWidthSm: Record<string, string> = {
+    'chicky-choo': 'w-40',
+    'beary-cute': 'w-30',
+    'mochi': 'w-50',
+    'caths': 'w-60',
+  };
 
   return (
     <div className='text-[#7F4E1C] flex flex-col justify-center items-center mt-8'>
 
       {/* --------- Select the tables buttons ----------- */}
-      <div className="flex items-center justify-center gap-2 m-5 flex-wrap">
+      <div className="flex items-center justify-center gap-2 md:m-5 m-3 mb-5 flex-wrap">
       <div
         onClick={() => {
           tableRef.current = null;
           setTable(null);
         }}
-        className={`text-xl font-bold text-[#7F4E1C] rounded-full px-5 py-2 cursor-pointer border-2 border-[#7F4E1C] ${
+        className={`lg:text-xl font-bold text-[#7F4E1C] rounded-full lg:px-5 lg:py-2 px-3 py-2 cursor-pointer border-2 border-[#7F4E1C] ${
           table === null ? "bg-[#7F4E1C] text-white" : ""
         }`}
       >
@@ -319,7 +337,7 @@ const page = () => {
         <div
           key={num}
           onClick={() => toggleTable(num)}
-          className={`text-xl font-bold text-[#7F4E1C] rounded-full px-5 py-2 cursor-pointer border-2 border-[#7F4E1C] ${
+          className={`lg:text-xl text-lg font-bold text-[#7F4E1C] rounded-full lg:px-5 lg:py-2 px-3 py-1 cursor-pointer border-2 border-[#7F4E1C] ${
             table?.includes(num) ? "bg-[#7F4E1C] text-white" : ""
           }`}
         >
@@ -330,28 +348,28 @@ const page = () => {
 
       {/* --------- Practice section ----------- */}
 
-      <div className='flex items-center justify-center gap-20 mt-5'>
+      <div className='flex sm:flex-row flex-col items-center justify-center sm:gap-20 md:mt-5 mt-2'>
         {/* ----------- Right side --------- */}
-        <div className="flex flex-col items-center justify-between h-90">
+        <div className="flex sm:flex-col sm:w-auto w-[70vw] items-center justify-between sm:mx-0 mx-8 sm:mb-0 mb-8 lg:h-90 md:h-80 ">
           <div className="flex flex-col items-center">
             <div className="text-xl">TIMER</div>
             <div className="text-5xl">00:{seconds < 10 && '0'}{seconds}</div>
           </div>
-          <img src={`${charMap[theme]}`} className={charWidth[theme]} alt="" />
+          <img src={`${charMap[theme]}`} className={` ${charWidthLg[theme]} ${charWidthMd[theme]} ${charWidthSm[theme]}  `} alt="" />
         </div>
 
         {/* ----------- Left Side ------------ */}
-        <div className={`flex flex-col border-2 ${bgMap[theme]} relative p-10 w-120 h-100 rounded-4xl text-center items-center justify-between`}>
+        <div className={`flex flex-col border-2 ${bgMap[theme]} relative p-10 lg:w-120 lg:h-100 sm:w-100 w-[90vw] h-70 rounded-4xl text-center items-center justify-between`}>
           {
 
             start === false
-              ? <div onClick={() => setStart(true)} className="text-4xl bg-[#7F4E1C] cursor-pointer rounded-full text-white px-5 py-2 ">START</div>
+              ? <div onClick={(e) => { e.stopPropagation(); setStart(true); }} className="flex items-center justify-center my-auto mx-auto text-4xl bg-[#7F4E1C] cursor-pointer rounded-full text-white px-7 py-3 ">START</div>
               :
               <>
-                <div onClick={() => setStart(false)} className=" rounded-full w-8 h-8 absolute right-5 top-5 text-[#7F4E1C] text-3xl hover:scale-115 transition-all duration-200 cursor-pointer"><BsPauseCircleFill /></div>
+                <div onClick={() => {setStart(false); setSeconds(0)}} className=" rounded-full w-8 h-8 absolute right-5 top-5 text-[#7F4E1C] text-3xl hover:scale-115 transition-all duration-200 cursor-pointer"><BsPauseCircleFill /></div>
                 <div className="">What is...</div>
                 <div className="text-6xl">{numberOne} x {numberTwo}</div>
-                <div className=" bg-[#7F4E1C] text-2xl h-10 flex items-center justify-center text-white rounded-full w-85">{spokenAnswer}</div>
+                <div className=" bg-[#7F4E1C] text-2xl h-10 flex items-center justify-center text-white rounded-full sm:w-85 w-60">{spokenAnswer}</div>
                 <div className={`text-lg  px-5 ${result === 'Correct!' ? 'text-green-700 bg-green-200': 'text-red-700 bg-red-200'} rounded-lg ${!result && 'hidden'}`}>{result}</div>
               </>
 
@@ -360,7 +378,7 @@ const page = () => {
           
 
       </div>
-      <div className='text-xl mt-5'> press spacebar to check your answer before timer ends </div>
+      <div className='md:text-xl text-md m-5 text-center'> press spacebar or click anywhere to check your answer before timer ends </div>
     </div>
   )
 }
